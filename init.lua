@@ -576,6 +576,7 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
+        denols = {},
         --
 
         lua_ls = {
@@ -592,6 +593,18 @@ require('lazy').setup({
             },
           },
         },
+      }
+
+      local nvim_lsp = require 'lspconfig'
+      nvim_lsp.denols.setup {
+        on_attach = on_attach,
+        root_dir = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc'),
+      }
+
+      nvim_lsp.ts_ls.setup {
+        on_attach = on_attach,
+        root_dir = nvim_lsp.util.root_pattern 'package.json',
+        single_file_support = false,
       }
 
       -- Ensure the servers and tools above are installed
