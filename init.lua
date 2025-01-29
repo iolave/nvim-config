@@ -605,6 +605,7 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
         -- denols = {},
+        jsonls = {},
         --
         terraformls = {},
 
@@ -955,6 +956,8 @@ require('lazy').setup({
 
 vim.keymap.set('n', '<leader>ptt', ':tabnew<cr>')
 vim.keymap.set('n', '<leader>ptn', ':tabNext<cr>')
-
+vim.keymap.set('n', '<leader>mf', ':Explore<cr>', { desc = '[M]y [F]iles' })
+vim.keymap.set('n', '<leader>mvs', ':vsplit<cr>', { desc = '[M]y [V]ertical [S]plit' })
+vim.keymap.set('n', '<leader>ms', ':split<cr>', { desc = '[M]y [S]plit' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
