@@ -610,10 +610,19 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        ts_ls = {},
-        -- denols = {},
+        ts_ls = {
+          root_dir = require('lspconfig').util.root_pattern { 'package.json', 'tsconfig.json' },
+          single_file_support = false,
+          settings = {},
+        },
+        denols = {
+          root_dir = require('lspconfig').util.root_pattern { 'deno.json', 'deno.jsonc' },
+          --single_file_support = false,
+          settings = {},
+        },
         jsonls = {},
+        yamlls = {},
+        dockerls = {},
         --
         terraformls = {},
 
@@ -632,18 +641,6 @@ require('lazy').setup({
           },
         },
       }
-
-      -- local nvim_lsp = require 'lspconfig'
-      -- nvim_lsp.denols.setup {
-      --   on_attach = on_attach,
-      --   root_dir = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc'),
-      -- }
-
-      -- nvim_lsp.ts_ls.setup {
-      --   on_attach = on_attach,
-      --   root_dir = nvim_lsp.util.root_pattern 'package.json',
-      --   single_file_support = false,
-      -- }
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
