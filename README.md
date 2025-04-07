@@ -67,7 +67,9 @@ fork to your machine using one of the commands below, depending on your OS.
 <details><summary> Linux and Mac </summary>
 
 ```sh
-git clone https://github.com/nvim-lua/kickstart.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
+git clone https://github.com/iolave/nvim-config.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
+cd "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
+git submodule init && git submodule update --recursive
 ```
 
 </details>
