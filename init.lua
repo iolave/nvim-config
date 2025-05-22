@@ -405,7 +405,6 @@ require('lazy').setup({
         -- `build` is used to run some command when the plugin is installed/updated.
         -- This is only run then, not every time Neovim starts up.
         build = 'make',
-
         -- `cond` is a condition used to determine whether this plugin should be
         -- installed and loaded.
         cond = function()
@@ -454,6 +453,7 @@ require('lazy').setup({
             require('telescope.themes').get_dropdown(),
           },
         },
+        file_ignore_patterns = { '^./.git/', '^node_modules/', '^vendor/' },
       }
 
       -- Enable Telescope extensions if they are installed
@@ -708,7 +708,6 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -716,20 +715,20 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
+        gopls = {},
         ts_ls = {
-          root_dir = require('lspconfig').util.root_pattern { 'package.json', 'tsconfig.json' },
+          root_dir = require('lspconfig').util.root_pattern { 'package.json', 'package-lock.json', 'tsconfig.json' },
           single_file_support = false,
           settings = {},
         },
         denols = {
           root_dir = require('lspconfig').util.root_pattern { 'deno.json', 'deno.jsonc' },
-          --single_file_support = false,
+          single_file_support = false,
           settings = {},
         },
         jsonls = {},
         yamlls = {},
         dockerls = {},
-        --
         terraformls = {},
 
         lua_ls = {
@@ -1066,3 +1065,21 @@ vim.keymap.set('n', '<leader>mvs', ':vsplit<cr>', { desc = '[M]y [V]ertical [S]p
 vim.keymap.set('n', '<leader>ms', ':split<cr>', { desc = '[M]y [S]plit' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    local is_node_project = vim.fn.filereadable 'package.json' == 1
+    local is_deno_project = vim.fn.filereadable 'deno.json' == 1
+
+    -- Disable Denols in Node.js projects
+    if client.name == 'denols' and is_node_project then
+      client.stop()
+    end
+
+    -- Disable tsserver in Deno projects
+    if client.name == 'ts_ls' and is_deno_project then
+      client.stop()
+    end
+  end,
+})
