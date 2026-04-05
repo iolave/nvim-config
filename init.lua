@@ -710,6 +710,7 @@ require('lazy').setup({
         yamlls = {},
         dockerls = {},
         terraformls = {},
+        jdtls = {},
 
         lua_ls = {
           -- cmd = { ... },
@@ -763,6 +764,43 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'mfussenegger/nvim-jdtls',
+    ft = 'java', -- Only load when opening a Java file
+    config = function()
+      local function setup_jdtls()
+        local config = {
+          cmd = { 'jdtls' }, -- Ensure 'jdtls' is in your system PATH or Mason bin
+          root_dir = vim.fs.dirname(vim.fs.find({ '.git', 'mvnw', 'gradlew' }, { upward = true })[1]),
+          settings = {
+            java = {
+              configuration = {
+                runtimes = {
+                  {
+                    name = 'temurin-jdk-11',
+                    path = '/home/iolave/Downloads/jdk-11.0.30+7',
+                    default = true,
+                  },
+                },
+              },
+            },
+          },
+        }
+        require('jdtls').start_or_attach(config)
+      end
+
+      -- Trigger the setup on Java filetype events
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'java',
+        callback = setup_jdtls,
+      })
+
+      -- Call once immediately if already in a java file
+      if vim.bo.filetype == 'java' then
+        setup_jdtls()
+      end
+    end,
+  },
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -979,10 +1017,22 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+    main = 'nvim-treesitter.config', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
