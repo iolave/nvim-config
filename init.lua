@@ -83,12 +83,57 @@ I hope you enjoy your Neovim journey,
 
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
-
 -- Set <space> as the leader key
+
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+local function format_with_gjf()
+  local cmd = 'npx prettier'
+  local args = { '--plugin=prettier-plugin-java', '--write' }
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local fname = vim.api.nvim_buf_get_name(bufnr)
+  if fname == '' then
+    vim.notify('No filename for buffer; save file first.', vim.log.levels.WARN)
+    return
+  end
+
+  -- build job args: if using gjf wrapper that edits file in-place, pass filename
+  local job_args = vim.deepcopy(args)
+  table.insert(job_args, fname)
+
+  -- run the external formatter as an async job
+  vim.fn.jobstart(vim.fn.join(vim.list_extend({ cmd }, job_args), ' '), {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_exit = function(_, exit_code, _)
+      if exit_code ~= 0 then
+        vim.schedule(function()
+          vim.notify('failed to format (exit ' .. tostring(exit_code) .. ')', vim.log.levels.ERROR)
+        end)
+        return
+      end
+
+      -- reload buffer to reflect changes made in-place
+      vim.schedule(function()
+        local view = vim.fn.winsaveview()
+        vim.api.nvim_buf_call(bufnr, function()
+          vim.cmd 'edit'
+        end)
+        vim.fn.winrestview(view)
+        vim.notify('Formatted java', vim.log.levels.INFO)
+      end)
+    end,
+  })
+end
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = '*.java',
+  callback = format_with_gjf,
+})
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
@@ -774,6 +819,9 @@ require('lazy').setup({
           root_dir = vim.fs.dirname(vim.fs.find({ '.git', 'mvnw', 'gradlew' }, { upward = true })[1]),
           settings = {
             java = {
+              format = {
+                enabled = false,
+              },
               configuration = {
                 runtimes = {
                   {
