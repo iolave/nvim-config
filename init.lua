@@ -13,6 +13,7 @@ local function loadPlugins()
     require 'plugins.telescope',
     require 'plugins.lspconfig',
     require 'plugins.jdtls', -- if loaded before nvim-lspconfig, will not work
+    require 'plugins.indent-blankline',
   }
 end
 
