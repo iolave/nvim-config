@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > This repository was migrated to codeberg.
 > 
-> Please visit [codeberg.org/mice1337/config](https://codeberg.org/mice1337/config)
+> Please visit [codeberg.org/mice1337/nvim-config](https://codeberg.org/mice1337/nvim-config)
 
 ## Introduction
 
