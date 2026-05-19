@@ -1,5 +1,10 @@
 # kickstart.nvim
 
+> [!IMPORTANT]
+> This repository was migrated to codeberg.
+> 
+> Please visit [codeberg.org/mice1337/config](https://codeberg.org/mice1337/config)
+
 ## Introduction
 
 A starting point for Neovim that is:
